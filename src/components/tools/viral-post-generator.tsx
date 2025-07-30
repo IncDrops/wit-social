@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Sparkles, Lightbulb, ClipboardCopy } from "lucide-react";
+import { Loader2, Sparkles, Lightbulb, ClipboardCopy, Lock } from "lucide-react";
 import type { ViralPostIdeasOutput } from "@/ai/flows/viral-post-idea-generator";
 import { generateViralPostIdeasAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Slider } from "@/components/ui/slider";
+import { useAccessStore } from "@/hooks/use-access-store";
+import Link from "next/link";
 
 const formSchema = z.object({
   topic: z.string().min(2, "Topic must be at least 2 characters.").max(50, "Topic must be less than 50 characters."),
@@ -26,6 +28,8 @@ export function ViralPostGenerator() {
   const [result, setResult] = useState<ViralPostIdeasOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { hasAccess, useCredit } = useAccessStore();
+  const canUseTool = hasAccess();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,13 +42,18 @@ export function ViralPostGenerator() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+     if (!canUseTool) {
+        toast({ variant: "destructive", description: "You need to purchase access to use this tool."});
+        return;
+    }
     setIsLoading(true);
     setResult(null);
-    const actionResult = await generateViralPostIdeasAction(values);
+    const actionResult = await generateViralPostIdeasAction(values, { hasAccess: canUseTool });
     if (actionResult.error) {
       toast({ variant: "destructive", description: actionResult.error });
     } else {
       setResult(actionResult.data ?? null);
+      useCredit();
     }
     setIsLoading(false);
   }
@@ -143,11 +152,16 @@ export function ViralPostGenerator() {
                 )}
               />
             </CardContent>
-            <CardFooter>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+            <CardFooter className="flex-col items-start gap-4">
+              <Button type="submit" disabled={isLoading || !canUseTool}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (canUseTool ? <Sparkles className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />)}
                 Generate Ideas
               </Button>
+               {!canUseTool && (
+                 <p className="text-xs text-muted-foreground">
+                    You're out of credits. <Button variant="link" asChild className="p-0 h-auto"><Link href="/?tool=billing">Purchase more</Link></Button> to continue.
+                </p>
+              )}
             </CardFooter>
           </form>
         </Form>

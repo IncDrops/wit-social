@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FC } from "react";
 import Link from "next/link";
 import {
@@ -30,6 +30,8 @@ import { HashtagGenerator } from "@/components/tools/hashtag-generator";
 import { HookAnalyzer } from "@/components/tools/attention-hook-analyzer";
 import { ContentSharer } from "@/components/tools/content-sharer";
 import { Billing } from "@/components/tools/billing";
+import { useAccessStore } from "@/hooks/use-access-store";
+import { Badge } from "./ui/badge";
 
 type ToolId =
   | "trends"
@@ -61,30 +63,51 @@ const tools: Tool[] = [
   { id: "billing", label: "Billing", icon: CreditCard, component: Billing },
 ];
 
-const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; onToolClick: (id: ToolId) => void }) => (
-  <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
-    <div className="p-4">
-      <Logo />
-    </div>
-    <nav className="flex-1 px-4 space-y-2">
-      {tools.map((tool) => (
-        <Button
-          key={tool.id}
-          variant={activeToolId === tool.id ? "secondary" : "ghost"}
-          className="w-full justify-start"
-          onClick={() => onToolClick(tool.id)}
-        >
-          <tool.icon className="mr-3 h-5 w-5" />
-          {tool.label}
-        </Button>
-      ))}
-    </nav>
-  </div>
-);
+const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; onToolClick: (id: ToolId) => void }) => {
+    const { credits, accessType } = useAccessStore();
+    return (
+        <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
+            <div className="p-4">
+            <Logo />
+            </div>
+            <nav className="flex-1 px-4 space-y-2">
+            {tools.map((tool) => (
+                <Button
+                key={tool.id}
+                variant={activeToolId === tool.id ? "secondary" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => onToolClick(tool.id)}
+                >
+                <tool.icon className="mr-3 h-5 w-5" />
+                {tool.label}
+                </Button>
+            ))}
+            </nav>
+            <div className="p-4 mt-auto">
+                 {accessType === 'credits' && credits > 0 && (
+                    <Badge variant="outline" className="w-full justify-center py-2">
+                        {credits} Credits Remaining
+                    </Badge>
+                )}
+                 {accessType === 'pass' && (
+                    <Badge variant="outline" className="w-full justify-center py-2">
+                        24-Hour Pass Active
+                    </Badge>
+                )}
+            </div>
+        </div>
+    )
+};
 
-export function DashboardLayout() {
-  const [activeToolId, setActiveToolId] = useState<ToolId>("trends");
+export function DashboardLayout({ initialTool }: { initialTool?: string }) {
+  const [activeToolId, setActiveToolId] = useState<ToolId>( (initialTool as ToolId) || "trends");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  useEffect(() => {
+    if (initialTool && tools.some(t => t.id === initialTool)) {
+      setActiveToolId(initialTool as ToolId);
+    }
+  }, [initialTool]);
 
   const ActiveToolComponent = tools.find((t) => t.id === activeToolId)?.component;
 

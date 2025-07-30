@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Sparkles, Star } from "lucide-react";
+import { Loader2, Sparkles, Star, Lock } from "lucide-react";
 import type { AnalyzeAttentionHookOutput } from "@/ai/flows/attention-hook-analyzer";
 import { analyzeAttentionHookAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "../ui/badge";
+import { useAccessStore } from "@/hooks/use-access-store";
+import Link from "next/link";
 
 const formSchema = z.object({
   platform: z.string().min(1, "Platform is required."),
@@ -24,6 +26,8 @@ export function HookAnalyzer() {
   const [result, setResult] = useState<AnalyzeAttentionHookOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { hasAccess, useCredit } = useAccessStore();
+  const canUseTool = hasAccess();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,13 +38,18 @@ export function HookAnalyzer() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!canUseTool) {
+        toast({ variant: "destructive", description: "You need to purchase access to use this tool."});
+        return;
+    }
     setIsLoading(true);
     setResult(null);
-    const actionResult = await analyzeAttentionHookAction(values);
+    const actionResult = await analyzeAttentionHookAction(values, { hasAccess: canUseTool });
     if (actionResult.error) {
       toast({ variant: "destructive", description: actionResult.error });
     } else {
       setResult(actionResult.data ?? null);
+      useCredit();
     }
     setIsLoading(false);
   }
@@ -92,11 +101,16 @@ export function HookAnalyzer() {
                 )}
               />
             </CardContent>
-            <CardFooter>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+            <CardFooter className="flex-col items-start gap-4">
+              <Button type="submit" disabled={isLoading || !canUseTool}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (canUseTool ? <Sparkles className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />)}
                 Analyze Hook
               </Button>
+              {!canUseTool && (
+                 <p className="text-xs text-muted-foreground">
+                    You're out of credits. <Button variant="link" asChild className="p-0 h-auto"><Link href="/?tool=billing">Purchase more</Link></Button> to continue.
+                </p>
+              )}
             </CardFooter>
           </form>
         </Form>

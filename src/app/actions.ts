@@ -10,7 +10,12 @@ import { generateShareLink, type GenerateShareLinkInput } from "@/ai/flows/conte
 import Stripe from "stripe";
 import { v4 as uuidv4 } from "uuid";
 
-export async function generateViralPostIdeasAction(input: ViralPostIdeasInput) {
+interface ActionParams {
+  hasAccess: boolean;
+}
+
+export async function generateViralPostIdeasAction(input: ViralPostIdeasInput, params: ActionParams) {
+  if (!params.hasAccess) return { error: "You need to purchase access to use this tool." };
   try {
     const result = await generateViralPostIdeas(input);
     return { data: result };
@@ -20,7 +25,8 @@ export async function generateViralPostIdeasAction(input: ViralPostIdeasInput) {
   }
 }
 
-export async function optimizeCaptionAction(input: OptimizeCaptionInput) {
+export async function optimizeCaptionAction(input: OptimizeCaptionInput, params: ActionParams) {
+  if (!params.hasAccess) return { error: "You need to purchase access to use this tool." };
   try {
     const result = await optimizeCaption(input);
     return { data: result };
@@ -30,7 +36,8 @@ export async function optimizeCaptionAction(input: OptimizeCaptionInput) {
   }
 }
 
-export async function trendPredictionSummaryAction(input: TrendPredictionSummaryInput) {
+export async function trendPredictionSummaryAction(input: TrendPredictionSummaryInput, params: ActionParams) {
+    if (!params.hasAccess) return { error: "You need to purchase access to use this tool." };
   try {
     const result = await trendPredictionSummary(input);
     return { data: result };
@@ -40,7 +47,8 @@ export async function trendPredictionSummaryAction(input: TrendPredictionSummary
   }
 }
 
-export async function getOptimalTimeToPostAction(input: OptimalTimeToPostInput) {
+export async function getOptimalTimeToPostAction(input: OptimalTimeToPostInput, params: ActionParams) {
+    if (!params.hasAccess) return { error: "You need to purchase access to use this tool." };
   try {
     const result = await getOptimalTimeToPost(input);
     return { data: result };
@@ -50,7 +58,8 @@ export async function getOptimalTimeToPostAction(input: OptimalTimeToPostInput) 
   }
 }
 
-export async function generateHashtagsAction(input: GenerateHashtagsInput) {
+export async function generateHashtagsAction(input: GenerateHashtagsInput, params: ActionParams) {
+    if (!params.hasAccess) return { error: "You need to purchase access to use this tool." };
   try {
     const result = await generateHashtags(input);
     return { data: result };
@@ -60,7 +69,8 @@ export async function generateHashtagsAction(input: GenerateHashtagsInput) {
   }
 }
 
-export async function analyzeAttentionHookAction(input: AnalyzeAttentionHookInput) {
+export async function analyzeAttentionHookAction(input: AnalyzeAttentionHookInput, params: ActionParams) {
+    if (!params.hasAccess) return { error: "You need to purchase access to use this tool." };
   try {
     const result = await analyzeAttentionHook(input);
     return { data: result };

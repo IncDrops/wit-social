@@ -6,6 +6,7 @@ interface AccessState {
   credits: number;
   passToken: string | null;
   passExpiresAt: string | null;
+  accessType: 'pass' | 'credits' | null;
   hasAccess: () => boolean;
   useCredit: () => void;
   addCredits: (amount: number) => void;
@@ -18,6 +19,7 @@ export const useAccessStore = create<AccessState>()(
       credits: 0,
       passToken: null,
       passExpiresAt: null,
+      accessType: null,
 
       hasAccess: () => {
         const { credits, passToken, passExpiresAt } = get();
@@ -25,21 +27,43 @@ export const useAccessStore = create<AccessState>()(
         if (passToken && passExpiresAt) {
           const now = new Date();
           const expiry = new Date(passExpiresAt);
-          return now < expiry;
+          if (now < expiry) {
+            return true;
+          } else {
+            // Pass has expired, clear it
+            set({ passToken: null, passExpiresAt: null, accessType: get().credits > 0 ? 'credits' : null });
+            return false;
+          }
         }
         return false;
       },
 
       useCredit: () => {
-        set((state) => ({ credits: Math.max(0, state.credits - 1) }));
+        const { accessType, credits } = get();
+        if (accessType === 'credits' && credits > 0) {
+            set({ credits: credits - 1 });
+            if (credits - 1 <= 0) {
+                set({ accessType: null });
+            }
+        }
       },
 
       addCredits: (amount: number) => {
-        set((state) => ({ credits: state.credits + amount }));
+        set((state) => ({ 
+            credits: state.credits + amount,
+            accessType: 'credits',
+            passToken: null, // Clear pass when buying credits
+            passExpiresAt: null,
+        }));
       },
 
       setAccessPass: (token: string, expiresAt: string) => {
-        set({ passToken: token, passExpiresAt: expiresAt, credits: 0 });
+        set({ 
+            passToken: token, 
+            passExpiresAt: expiresAt, 
+            accessType: 'pass',
+            credits: 0 // Clear credits when buying a pass
+        });
       },
     }),
     {

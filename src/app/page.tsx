@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,16 @@ export default function Home() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { setAccessPass, addCredits } = useAccessStore();
+  const [activeTool, setActiveTool] = useState("trends");
+
+  useEffect(() => {
+    const tool = searchParams.get("tool");
+    if (tool) {
+      setActiveTool(tool);
+       // Optional: clear the URL parameter
+       window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
@@ -45,5 +55,5 @@ export default function Home() {
     }
   }, [searchParams, toast, setAccessPass, addCredits]);
 
-  return <DashboardLayout />;
+  return <DashboardLayout initialTool={activeTool} />;
 }
