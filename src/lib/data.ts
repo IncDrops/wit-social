@@ -1,4 +1,12 @@
-export const mockTrends = [
+export interface Trend {
+    id: string;
+    title: string;
+    category: string;
+    engagement_score: number;
+    source: string;
+}
+
+export const mockTrends: Trend[] = [
     { 
         id: '1', 
         title: 'TikTok’s New Algorithm Update', 
