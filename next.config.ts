@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path?session_id=:session_id',
+        destination: '/',
+        permanent: true,
+      },
+    ]
+  }
 };
 
 export default nextConfig;
