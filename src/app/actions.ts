@@ -106,10 +106,13 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
   
   // When deployed, Firebase App Hosting provides this environment variable.
   // For local testing, we fall back to the URL defined in .env.local.
-  const appUrl = process.env.FIREBASE_APP_HOSTING_URL || process.env.NEXT_PUBLIC_APP_URL;
+  // We are now hardcoding the deployed URL to ensure it works.
+  const appUrl = process.env.NODE_ENV === 'production' 
+    ? "https://studio--trendsights-ai-7ji66.us-central1.hosted.app"
+    : process.env.NEXT_PUBLIC_APP_URL;
 
   if (!appUrl) {
-    const errorMessage = "Could not determine the redirect URL. Please ensure NEXT_PUBLIC_APP_URL is set in your .env.local file for local development.";
+    const errorMessage = "Could not determine the redirect URL. Please ensure NEXT_PUBLIC_APP_URL is set in your .env.local for local development.";
     console.error(errorMessage);
     return { error: errorMessage };
   }
