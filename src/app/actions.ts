@@ -116,9 +116,9 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     }
 
     return { data: { url: session.url } };
-  } catch (error) {
-    console.error(error);
-    return { error: "An unexpected error occurred while creating the checkout session." };
+  } catch (error: any) {
+    console.error("Stripe Error:", error.message);
+    return { error: `An unexpected error occurred: ${error.message}` };
   }
 }
 
