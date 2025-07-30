@@ -14,6 +14,7 @@ import {
   Menu,
   ShieldCheck,
   Share2,
+  CreditCard,
 } from "lucide-react";
 
 import { Logo } from "@/components/logo";
@@ -28,6 +29,7 @@ import { OptimalTimeToPost } from "@/components/tools/optimal-time-to-post";
 import { HashtagGenerator } from "@/components/tools/hashtag-generator";
 import { HookAnalyzer } from "@/components/tools/attention-hook-analyzer";
 import { ContentSharer } from "@/components/tools/content-sharer";
+import { Billing } from "@/components/tools/billing";
 
 type ToolId =
   | "trends"
@@ -37,7 +39,8 @@ type ToolId =
   | "time-to-post"
   | "hashtag-generator"
   | "hook-analyzer"
-  | "content-sharer";
+  | "content-sharer"
+  | "billing";
 
 interface Tool {
   id: ToolId;
@@ -55,6 +58,7 @@ const tools: Tool[] = [
   { id: "hashtag-generator", label: "Hashtag Generator", icon: Hash, component: HashtagGenerator },
   { id: "hook-analyzer", label: "Attention Hook Analyzer", icon: Megaphone, component: HookAnalyzer },
   { id: "content-sharer", label: "Content Sharer", icon: Share2, component: ContentSharer },
+  { id: "billing", label: "Billing", icon: CreditCard, component: Billing },
 ];
 
 const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; onToolClick: (id: ToolId) => void }) => (
