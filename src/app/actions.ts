@@ -91,18 +91,34 @@ export async function generateShareLinkAction(input: GenerateShareLinkInput) {
 }
 
 export async function createCheckoutSessionAction({ priceId }: { priceId: string }) {
-  if (!process.env.STRIPE_SECRET_KEY) {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
     return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment variables." };
   }
   if (!priceId) {
     return { error: "Price ID was not provided. Please select a product." };
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  const stripe = new Stripe(secretKey, {
     apiVersion: "2024-06-20",
   });
   
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+  // --- DIAGNOSTIC LOGS ---
+  console.log("--- STRIPE CHECKOUT DIAGNOSTICS ---");
+  console.log("Attempting to create checkout session with the following values:");
+  console.log("  - Price ID:", priceId);
+  console.log("  - App URL for redirect:", appUrl);
+  console.log("  - Using Stripe Secret Key starting with:", secretKey.substring(0, 12));
+  console.log("-------------------------------------");
+
+  if (!appUrl) {
+    const errorMessage = "Could not determine the redirect URL. Please ensure NEXT_PUBLIC_APP_URL is set in your .env.local file and that the server has been restarted.";
+    console.error(errorMessage);
+    return { error: errorMessage };
+  }
+
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -141,8 +157,8 @@ export async function verifyCheckoutSessionAction({ sessionId }: { sessionId: st
     if (session.payment_status === 'paid') {
       const priceId = session.metadata?.priceId;
       
-      // Handle Starter Pack
-      if (priceId === process.env.NEXT_PUBLIC_STRIPE_PASS_PRICE_ID) {
+      const passPriceId = process.env.NEXT_PUBLIC_STRIPE_PASS_PRICE_ID;
+      if (priceId === passPriceId) {
         const expiresAt = new Date();
         expiresAt.setHours(expiresAt.getHours() + 24);
         
@@ -157,7 +173,6 @@ export async function verifyCheckoutSessionAction({ sessionId }: { sessionId: st
         };
       }
 
-      // Handle Credit Packs
       const creatorPriceId = process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID;
       const agencyPriceId = process.env.NEXT_PUBLIC_STRIPE_AGENCY_PRICE_ID;
       let credits = 0;
