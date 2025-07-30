@@ -112,7 +112,6 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     return { error: errorMessage };
   }
 
-
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
