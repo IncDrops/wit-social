@@ -136,18 +136,17 @@ export async function verifyCheckoutSessionAction({ sessionId }: { sessionId: st
     if (session.payment_status === 'paid') {
       const priceId = session.metadata?.priceId;
       
-      // Handle One-Off Pass
+      // Handle Starter Pack
       if (priceId === process.env.NEXT_PUBLIC_STRIPE_PASS_PRICE_ID) {
-        const token = uuidv4();
         const expiresAt = new Date();
         expiresAt.setHours(expiresAt.getHours() + 24);
         
         return { 
           data: { 
             success: true, 
-            message: "Payment verified successfully. You have 24-hour access.",
+            message: "Payment verified successfully. You have 10 credits for 24 hours.",
             accessType: 'pass',
-            token: token,
+            creditsAdded: 10,
             expiresAt: expiresAt.toISOString(),
           } 
         };

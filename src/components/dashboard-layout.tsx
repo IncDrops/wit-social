@@ -64,7 +64,28 @@ const tools: Tool[] = [
 ];
 
 const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; onToolClick: (id: ToolId) => void }) => {
-    const { credits, accessType } = useAccessStore();
+    const { credits, accessType, passExpiresAt } = useAccessStore();
+    const [timeLeft, setTimeLeft] = useState("");
+
+    useEffect(() => {
+        if (accessType === 'pass' && passExpiresAt) {
+            const interval = setInterval(() => {
+                const now = new Date();
+                const expiry = new Date(passExpiresAt);
+                const diff = expiry.getTime() - now.getTime();
+                if (diff <= 0) {
+                    setTimeLeft("Expired");
+                    clearInterval(interval);
+                } else {
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    setTimeLeft(`${hours}h ${minutes}m left`);
+                }
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [accessType, passExpiresAt]);
+
     return (
         <div className="flex flex-col h-full bg-background text-foreground">
             <div className="p-4">
@@ -84,14 +105,10 @@ const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; o
             ))}
             </nav>
             <div className="p-4 mt-auto">
-                 {accessType === 'credits' && credits > 0 && (
-                    <Badge variant="outline" className="w-full justify-center py-2">
-                        {credits} Credits Remaining
-                    </Badge>
-                )}
-                 {accessType === 'pass' && (
-                    <Badge variant="outline" className="w-full justify-center py-2">
-                        24-Hour Pass Active
+                 {credits > 0 && (
+                    <Badge variant="outline" className="w-full justify-center py-2 flex-col h-auto">
+                        <span>{credits} Credits Remaining</span>
+                        {accessType === 'pass' && timeLeft && <span className="text-xs font-normal">{timeLeft}</span>}
                     </Badge>
                 )}
             </div>

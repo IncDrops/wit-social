@@ -41,8 +41,8 @@ export default function Home() {
           });
 
           // Handle access grant
-          if (result.data.accessType === 'pass' && result.data.token && result.data.expiresAt) {
-            setAccessPass(result.data.token, result.data.expiresAt);
+          if (result.data.accessType === 'pass' && result.data.expiresAt && result.data.creditsAdded) {
+            setAccessPass(result.data.expiresAt, result.data.creditsAdded);
           } else if (result.data.accessType === 'credits' && result.data.creditsAdded) {
             addCredits(result.data.creditsAdded);
           }

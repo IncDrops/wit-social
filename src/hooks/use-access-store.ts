@@ -4,45 +4,44 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface AccessState {
   credits: number;
-  passToken: string | null;
   passExpiresAt: string | null;
   accessType: 'pass' | 'credits' | null;
   hasAccess: () => boolean;
   useCredit: () => void;
   addCredits: (amount: number) => void;
-  setAccessPass: (token: string, expiresAt: string) => void;
+  setAccessPass: (expiresAt: string, credits: number) => void;
 }
 
 export const useAccessStore = create<AccessState>()(
   persist(
     (set, get) => ({
       credits: 0,
-      passToken: null,
       passExpiresAt: null,
       accessType: null,
 
       hasAccess: () => {
-        const { credits, passToken, passExpiresAt } = get();
-        if (credits > 0) return true;
-        if (passToken && passExpiresAt) {
-          const now = new Date();
-          const expiry = new Date(passExpiresAt);
-          if (now < expiry) {
-            return true;
-          } else {
-            // Pass has expired, clear it
-            set({ passToken: null, passExpiresAt: null, accessType: get().credits > 0 ? 'credits' : null });
-            return false;
-          }
+        const { credits, passExpiresAt, accessType } = get();
+        if (accessType === 'pass') {
+            if (passExpiresAt) {
+                const now = new Date();
+                const expiry = new Date(passExpiresAt);
+                if (now < expiry) {
+                    return credits > 0;
+                } else {
+                    // Pass has expired, clear it
+                    set({ passExpiresAt: null, accessType: get().credits > 0 ? 'credits' : null, credits: 0 });
+                    return false;
+                }
+            }
         }
-        return false;
+        return credits > 0;
       },
 
       useCredit: () => {
-        const { accessType, credits } = get();
-        if (accessType === 'credits' && credits > 0) {
+        const { credits } = get();
+        if (credits > 0) {
             set({ credits: credits - 1 });
-            if (credits - 1 <= 0) {
+            if (credits - 1 <= 0 && get().accessType !== 'pass') {
                 set({ accessType: null });
             }
         }
@@ -52,17 +51,15 @@ export const useAccessStore = create<AccessState>()(
         set((state) => ({ 
             credits: state.credits + amount,
             accessType: 'credits',
-            passToken: null, // Clear pass when buying credits
             passExpiresAt: null,
         }));
       },
 
-      setAccessPass: (token: string, expiresAt: string) => {
+      setAccessPass: (expiresAt: string, credits: number) => {
         set({ 
-            passToken: token, 
             passExpiresAt: expiresAt, 
             accessType: 'pass',
-            credits: 0 // Clear credits when buying a pass
+            credits: credits
         });
       },
     }),

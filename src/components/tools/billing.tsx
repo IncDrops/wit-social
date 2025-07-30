@@ -11,17 +11,17 @@ import { useToast } from "@/hooks/use-toast";
 
 const tiers = [
   {
-    name: "One-Off Pass",
+    name: "Starter Pack",
     priceId: process.env.NEXT_PUBLIC_STRIPE_PASS_PRICE_ID,
     price: "$5",
-    priceDescription: "One-time payment",
-    description: "Get 24-hour access to all tools. No limits, no recurring fees.",
+    priceDescription: "10 credits, 24-hour access",
+    description: "Perfect for trying out the tools for a specific project.",
     features: [
-      "Unlimited use of all tools",
-      "Perfect for single projects",
-      "24-hour access from time of purchase",
+      "10 credits to use on any tool",
+      "Access expires after 24 hours",
+      "Great for a single-day session",
     ],
-    cta: "Get 24-Hour Pass",
+    cta: "Get Started",
   },
   {
     name: "Creator Pack",
