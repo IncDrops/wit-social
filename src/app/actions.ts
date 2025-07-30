@@ -8,6 +8,7 @@ import { trendPredictionSummary, type TrendPredictionSummaryInput } from "@/ai/f
 import { generateViralPostIdeas, type ViralPostIdeasInput } from "@/ai/flows/viral-post-idea-generator";
 import { generateShareLink, type GenerateShareLinkInput } from "@/ai/flows/content-sharer";
 import Stripe from "stripe";
+import { v4 as uuidv4 } from "uuid";
 
 export async function generateViralPostIdeasAction(input: ViralPostIdeasInput) {
   try {
@@ -95,6 +96,9 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
       mode: 'payment',
       success_url: `${appUrl}/?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/`,
+      metadata: {
+        priceId: priceId,
+      }
     });
 
     if (!session.url) {
@@ -120,11 +124,44 @@ export async function verifyCheckoutSessionAction({ sessionId }: { sessionId: st
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     
     if (session.payment_status === 'paid') {
-      // Here you would typically fulfill the order, e.g.,
-      // - Look up the customer in your database.
-      // - Add credits to their account.
-      // - Generate and store an access token.
-      console.log("Payment for session " + sessionId + " was successful.");
+      const priceId = session.metadata?.priceId;
+      
+      // Handle One-Off Pass
+      if (priceId === process.env.NEXT_PUBLIC_STRIPE_PASS_PRICE_ID) {
+        const token = uuidv4();
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+        
+        return { 
+          data: { 
+            success: true, 
+            message: "Payment verified successfully. You have 24-hour access.",
+            accessType: 'pass',
+            token: token,
+            expiresAt: expiresAt.toISOString(),
+          } 
+        };
+      }
+
+      // Handle Credit Packs
+      const creatorPriceId = process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID;
+      const agencyPriceId = process.env.NEXT_PUBLIC_STRIPE_AGENCY_PRICE_ID;
+      let credits = 0;
+
+      if (priceId === creatorPriceId) credits = 50;
+      if (priceId === agencyPriceId) credits = 500;
+      
+      if (credits > 0) {
+        return {
+          data: {
+            success: true,
+            message: `Payment verified successfully. ${credits} credits have been added.`,
+            accessType: 'credits',
+            creditsAdded: credits,
+          }
+        };
+      }
+
       return { data: { success: true, message: "Payment verified successfully." } };
     } else {
       return { error: `Payment not successful. Status: ${session.payment_status}` };
