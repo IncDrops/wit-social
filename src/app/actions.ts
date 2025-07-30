@@ -105,3 +105,28 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     return { error: "An unexpected error occurred while creating the checkout session." };
   }
 }
+
+export async function verifyCheckoutSessionAction({ sessionId }: { sessionId: string }) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return { error: "Stripe is not configured." };
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    
+    if (session.payment_status === 'paid') {
+      // Here you would typically fulfill the order, e.g.,
+      // - Look up the customer in your database.
+      // - Add credits to their account.
+      // - Generate and store an access token.
+      console.log("Payment for session " + sessionId + " was successful.");
+      return { data: { success: true, message: "Payment verified successfully." } };
+    } else {
+      return { error: `Payment not successful. Status: ${session.payment_status}` };
+    }
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to verify checkout session." };
+  }
+}
