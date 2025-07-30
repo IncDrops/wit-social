@@ -105,7 +105,14 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  const appUrl = "https://studio--trendsights-ai-7ji66.us-central1.hosted.app";
+  const headersList = headers();
+  const origin = headersList.get('origin');
+
+  if (!origin) {
+    return { error: "Could not determine the request origin." };
+  }
+  
+  const appUrl = origin;
 
   try {
     const session = await stripe.checkout.sessions.create({
