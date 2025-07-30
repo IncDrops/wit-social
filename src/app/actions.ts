@@ -7,6 +7,7 @@ import { getOptimalTimeToPost, type OptimalTimeToPostInput } from "@/ai/flows/op
 import { trendPredictionSummary, type TrendPredictionSummaryInput } from "@/ai/flows/trend-prediction-summary";
 import { generateViralPostIdeas, type ViralPostIdeasInput } from "@/ai/flows/viral-post-idea-generator";
 import { generateShareLink, type GenerateShareLinkInput } from "@/ai/flows/content-sharer";
+import Stripe from "stripe";
 
 export async function generateViralPostIdeasAction(input: ViralPostIdeasInput) {
   try {
@@ -75,5 +76,32 @@ export async function generateShareLinkAction(input: GenerateShareLinkInput) {
   } catch (error) {
     console.error(error);
     return { error: "Failed to generate link. Please try again." };
+  }
+}
+
+export async function createCheckoutSessionAction({ priceId }: { priceId: string }) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment variables." };
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9002";
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: 'payment',
+      success_url: `${appUrl}/?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/`,
+    });
+
+    if (!session.url) {
+      return { error: "Could not create Stripe checkout session. Please try again." };
+    }
+
+    return { data: { url: session.url } };
+  } catch (error) {
+    console.error(error);
+    return { error: "An unexpected error occurred while creating the checkout session." };
   }
 }

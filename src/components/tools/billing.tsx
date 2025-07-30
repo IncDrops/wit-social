@@ -1,14 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Star } from "lucide-react";
+import { Check, Star, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
+import { createCheckoutSessionAction } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
 
 const tiers = [
   {
     name: "One-Off Pass",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PASS_PRICE_ID,
     price: "$5",
     priceDescription: "One-time payment",
     description: "Perfect for a single project or trying out our tools.",
@@ -21,6 +25,7 @@ const tiers = [
   },
   {
     name: "Creator Pack",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID,
     price: "$100",
     priceDescription: "50 credits ($2/credit)",
     description: "Ideal for regular content creators and small businesses.",
@@ -34,6 +39,7 @@ const tiers = [
   },
   {
     name: "Agency Bundle",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_AGENCY_PRICE_ID,
     price: "$500",
     priceDescription: "500 credits ($1/credit)",
     description: "Best value for power users and marketing agencies.",
@@ -47,6 +53,32 @@ const tiers = [
 ];
 
 export function Billing() {
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleCheckout = async (priceId: string | undefined) => {
+    if (!priceId) {
+      toast({
+        variant: "destructive",
+        description: "This product is not configured yet. Please check back later.",
+      });
+      return;
+    }
+    setIsLoading(priceId);
+    const result = await createCheckoutSessionAction({ priceId });
+
+    if (result.error || !result.data?.url) {
+      toast({
+        variant: "destructive",
+        description: result.error || "Could not redirect to checkout.",
+      });
+      setIsLoading(null);
+      return;
+    }
+
+    window.location.href = result.data.url;
+  };
+
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -82,7 +114,13 @@ export function Billing() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" variant={tier.popular ? "default" : "outline"}>
+              <Button 
+                className="w-full" 
+                variant={tier.popular ? "default" : "outline"}
+                onClick={() => handleCheckout(tier.priceId)}
+                disabled={isLoading === tier.priceId}
+              >
+                {isLoading === tier.priceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {tier.cta}
               </Button>
             </CardFooter>
