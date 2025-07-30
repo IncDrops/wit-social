@@ -10,7 +10,6 @@ import { generateViralPostIdeas, type ViralPostIdeasInput } from "@/ai/flows/vir
 import { generateShareLink, type GenerateShareLinkInput } from "@/ai/flows/content-sharer";
 import Stripe from "stripe";
 import { v4 as uuidv4 } from "uuid";
-import { headers } from "next/headers";
 
 interface ActionParams {
   hasAccess: boolean;
@@ -95,7 +94,7 @@ export async function generateShareLinkAction(input: GenerateShareLinkInput) {
 export async function createCheckoutSessionAction({ priceId }: { priceId: string }) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) {
-    return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your .env.local file." };
+    return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment variables." };
   }
   if (!priceId) {
     return { error: "Price ID was not provided. Please select a product." };
@@ -105,14 +104,7 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  const headersList = headers();
-  const origin = headersList.get('origin');
-
-  if (!origin) {
-    return { error: "Could not determine the request origin." };
-  }
-  
-  const appUrl = origin;
+  const appUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9004';
 
   try {
     const session = await stripe.checkout.sessions.create({

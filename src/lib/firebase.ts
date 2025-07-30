@@ -1,28 +1,24 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, type FirebaseOptions } from "firebase/app";
+import { initializeApp, getApps, getApp, type FirebaseOptions } from "firebase/app";
 import { getFirestore, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
-import { mockTrends, type Trend } from "@/lib/data";
+import type { Trend } from "@/lib/data";
 
 // Your web app's Firebase configuration
 const firebaseConfig: FirebaseOptions = {
   projectId: "trendsights-ai-2tpf3",
   appId: "1:240319807394:web:64860f2cf31c165723bcfb",
   storageBucket: "trendsights-ai-2tpf3.firebasestorage.app",
-  apiKey: "AIzaSyDmq35VItABLwPvp3-932moH8gp6ZroAVE",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "trendsights-ai-2tpf3.firebaseapp.com",
   messagingSenderId: "240319807394",
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
 // Function to fetch trends from Firestore
 export async function getTrends(): Promise<Trend[]> {
-    // Returning mock data for now so the user can repopulate their database.
-    // We will switch this back to Firestore later.
-    return mockTrends;
-
     try {
         const trendsCollection = collection(db, 'trends');
         const trendsQuery = query(trendsCollection, orderBy('engagement_score', 'desc'), limit(10));
@@ -40,9 +36,15 @@ export async function getTrends(): Promise<Trend[]> {
             });
         });
         
+        if (trends.length === 0) {
+           console.warn("No trends found in Firestore. Make sure the 'trends' collection exists and has documents.");
+        }
+        
         return trends;
     } catch (error) {
         console.error("Error fetching trends from Firestore: ", error);
+        // This could be due to permissions or incorrect setup.
+        // Return an empty array to prevent the app from crashing.
         return [];
     }
 }
