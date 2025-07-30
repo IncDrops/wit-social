@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { FC } from "react";
+import Link from "next/link";
 import {
   Bot,
   Hash,
@@ -117,6 +118,14 @@ export function DashboardLayout() {
             </p>
           </div>
         </main>
+
+        <footer className="p-4 md:p-6 border-t border-border text-center text-xs text-muted-foreground">
+            <div className="flex justify-center gap-4">
+                <Link href="/terms" className="hover:text-foreground">Terms of Use</Link>
+                <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+            </div>
+            <p className="mt-2">© {new Date().getFullYear()} TrendSights AI. All rights reserved.</p>
+        </footer>
       </div>
     </div>
   );
