@@ -10,6 +10,7 @@ import { generateViralPostIdeas, type ViralPostIdeasInput } from "@/ai/flows/vir
 import { generateShareLink, type GenerateShareLinkInput } from "@/ai/flows/content-sharer";
 import Stripe from "stripe";
 import { v4 as uuidv4 } from "uuid";
+import { headers } from "next/headers";
 
 interface ActionParams {
   hasAccess: boolean;
@@ -104,18 +105,10 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  // When deployed, Firebase App Hosting provides this environment variable.
-  // For local testing, we fall back to the URL defined in .env.local.
-  // We are now hardcoding the deployed URL to ensure it works.
-  const appUrl = process.env.NODE_ENV === 'production' 
-    ? "https://studio--trendsights-ai-7ji66.us-central1.hosted.app"
-    : process.env.NEXT_PUBLIC_APP_URL;
-
-  if (!appUrl) {
-    const errorMessage = "Could not determine the redirect URL. Please ensure NEXT_PUBLIC_APP_URL is set in your .env.local for local development.";
-    console.error(errorMessage);
-    return { error: errorMessage };
-  }
+  const headersList = headers();
+  const protocol = headersList.get('x-forwarded-proto') || 'http';
+  const host = headersList.get('host') || '';
+  const appUrl = `${protocol}://${host}`;
 
   try {
     const session = await stripe.checkout.sessions.create({
