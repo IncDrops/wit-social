@@ -102,7 +102,7 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9004";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
   try {
     const session = await stripe.checkout.sessions.create({
