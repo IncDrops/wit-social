@@ -110,6 +110,12 @@ export function DashboardLayout() {
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           {ActiveToolComponent ? <ActiveToolComponent /> : <div>Select a tool</div>}
+          <div className="mt-12 text-center text-muted-foreground max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold text-foreground">See Viral Trends Before They Blow Up—<br/>Then Ride the Wave</h2>
+            <p className="mt-4 text-lg">
+              TrendSights AI tracks rising trends in real-time and gives you AI-powered strategies to capitalize on them—no guessing, no sign-up.
+            </p>
+          </div>
         </main>
       </div>
     </div>
