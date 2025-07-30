@@ -104,7 +104,14 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  const appUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9004';
+  const vercelEnv = process.env.VERCEL_ENV;
+  let appUrl = 'http://localhost:9004';
+  if (vercelEnv === 'production') {
+      appUrl = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  } else if (process.env.VERCEL_URL) {
+      appUrl = `https://${process.env.VERCEL_URL}`;
+  }
+
 
   try {
     const session = await stripe.checkout.sessions.create({
