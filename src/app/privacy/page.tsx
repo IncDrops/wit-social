@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground">
             <p><strong>Last Updated: {new Date().toLocaleDateString()}</strong></p>
-            <p>TrendSights AI ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application.</p>
+            <p>WIT Social AI ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application.</p>
             
             <h2 className="text-xl font-semibold text-foreground">1. Information We Collect</h2>
             <p>We do not require user accounts. The only data we process is the information you directly provide to our tools, such as topics, captions, and other inputs for content generation and analysis. We do not collect personal information like your name, email address, or IP address.</p>
@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
             <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.</p>
             
             <h2 className="text-xl font-semibold text-foreground">7. Contact Us</h2>
-            <p>If you have any questions about this Privacy Policy, please contact us at privacy@trendsights.ai.</p>
+            <p>If you have any questions about this Privacy Policy, please contact us at privacy@willittrend.com.</p>
           </CardContent>
         </Card>
       </div>

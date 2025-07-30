@@ -3,7 +3,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "TrendSights AI",
+  title: "WIT Social AI",
   description: "AI-Powered Social Media Trend Analysis",
 };
 

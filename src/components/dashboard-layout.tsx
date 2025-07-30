@@ -114,7 +114,7 @@ export function DashboardLayout() {
           <div className="mt-12 text-center text-muted-foreground max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold text-foreground">See Viral Trends Before They Blow Up—<br/>Then Ride the Wave</h2>
             <p className="mt-4 text-lg">
-              TrendSights AI tracks rising trends in real-time and gives you AI-powered strategies to capitalize on them—no guessing, no sign-up.
+              WIT Social AI tracks rising trends in real-time and gives you AI-powered strategies to capitalize on them—no guessing, no sign-up.
             </p>
           </div>
         </main>
@@ -124,7 +124,7 @@ export function DashboardLayout() {
                 <Link href="/terms" className="hover:text-foreground">Terms of Use</Link>
                 <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
             </div>
-            <p className="mt-2">© {new Date().getFullYear()} TrendSights AI. All rights reserved.</p>
+            <p className="mt-2">© {new Date().getFullYear()} WillItTrend.com. All rights reserved.</p>
         </footer>
       </div>
     </div>
