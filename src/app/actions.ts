@@ -1,4 +1,3 @@
-
 "use server";
 
 import { analyzeAttentionHook, type AnalyzeAttentionHookInput } from "@/ai/flows/attention-hook-analyzer";
@@ -92,9 +91,6 @@ export async function generateShareLinkAction(input: GenerateShareLinkInput) {
 }
 
 export async function createCheckoutSessionAction({ priceId }: { priceId: string }) {
-  console.log("Attempting to create checkout session with Price ID:", priceId);
-  console.log("Using Stripe Secret Key starting with:", process.env.STRIPE_SECRET_KEY?.substring(0, 8));
-
   if (!process.env.STRIPE_SECRET_KEY) {
     return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment variables." };
   }
@@ -105,7 +101,8 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: "2024-06-20",
   });
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9004";
+  
+  const appUrl = process.env.FIREBASE_APP_HOSTING_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9004";
 
   try {
     const session = await stripe.checkout.sessions.create({
