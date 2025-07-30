@@ -94,7 +94,7 @@ export async function generateShareLinkAction(input: GenerateShareLinkInput) {
 export async function createCheckoutSessionAction({ priceId }: { priceId: string }) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) {
-    return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment variables." };
+    return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your .env.local file." };
   }
   if (!priceId) {
     return { error: "Price ID was not provided. Please select a product." };
@@ -104,8 +104,9 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  // Use the live Firebase URL if available (on deployment), otherwise use the local URL from env vars.
-  const appUrl = process.env.FIREBASE_APP_HOSTING_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9004";
+  // When deployed, Firebase App Hosting provides this environment variable.
+  // For local testing, we fall back to the URL defined in .env.local.
+  const appUrl = process.env.FIREBASE_APP_HOSTING_URL || process.env.NEXT_PUBLIC_APP_URL;
 
   if (!appUrl) {
     const errorMessage = "Could not determine the redirect URL. Please ensure NEXT_PUBLIC_APP_URL is set in your .env.local file for local development.";
