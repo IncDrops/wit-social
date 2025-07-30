@@ -6,6 +6,7 @@ import { generateHashtags, type GenerateHashtagsInput } from "@/ai/flows/hashtag
 import { getOptimalTimeToPost, type OptimalTimeToPostInput } from "@/ai/flows/optimal-time-to-post";
 import { trendPredictionSummary, type TrendPredictionSummaryInput } from "@/ai/flows/trend-prediction-summary";
 import { generateViralPostIdeas, type ViralPostIdeasInput } from "@/ai/flows/viral-post-idea-generator";
+import { generateShareLink, type GenerateShareLinkInput } from "@/ai/flows/content-sharer";
 
 export async function generateViralPostIdeasAction(input: ViralPostIdeasInput) {
   try {
@@ -64,5 +65,15 @@ export async function analyzeAttentionHookAction(input: AnalyzeAttentionHookInpu
   } catch (error) {
     console.error(error);
     return { error: "Failed to analyze hook. Please try again." };
+  }
+}
+
+export async function generateShareLinkAction(input: GenerateShareLinkInput) {
+  try {
+    const result = await generateShareLink(input);
+    return { data: result };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to generate link. Please try again." };
   }
 }

@@ -13,6 +13,7 @@ import {
   Clock,
   Menu,
   ShieldCheck,
+  Share2,
 } from "lucide-react";
 
 import { Logo } from "@/components/logo";
@@ -26,6 +27,7 @@ import { TrendPredictor } from "@/components/tools/trend-prediction-summary";
 import { OptimalTimeToPost } from "@/components/tools/optimal-time-to-post";
 import { HashtagGenerator } from "@/components/tools/hashtag-generator";
 import { HookAnalyzer } from "@/components/tools/attention-hook-analyzer";
+import { ContentSharer } from "@/components/tools/content-sharer";
 
 type ToolId =
   | "trends"
@@ -34,7 +36,8 @@ type ToolId =
   | "trend-predictor"
   | "time-to-post"
   | "hashtag-generator"
-  | "hook-analyzer";
+  | "hook-analyzer"
+  | "content-sharer";
 
 interface Tool {
   id: ToolId;
@@ -51,6 +54,7 @@ const tools: Tool[] = [
   { id: "time-to-post", label: "Optimal Time to Post", icon: Clock, component: OptimalTimeToPost },
   { id: "hashtag-generator", label: "Hashtag Generator", icon: Hash, component: HashtagGenerator },
   { id: "hook-analyzer", label: "Attention Hook Analyzer", icon: Megaphone, component: HookAnalyzer },
+  { id: "content-sharer", label: "Content Sharer", icon: Share2, component: ContentSharer },
 ];
 
 const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; onToolClick: (id: ToolId) => void }) => (

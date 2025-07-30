@@ -7,3 +7,4 @@ import '@/ai/flows/viral-post-idea-generator.ts';
 import '@/ai/flows/trend-prediction-summary.ts';
 import '@/ai/flows/hashtag-generator.ts';
 import '@/ai/flows/optimal-time-to-post.ts';
+import '@/ai/flows/content-sharer.ts';
