@@ -105,10 +105,7 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  const headersList = headers();
-  const protocol = headersList.get('x-forwarded-proto') || 'http';
-  const host = headersList.get('host') || '';
-  const appUrl = `${protocol}://${host}`;
+  const appUrl = "https://studio--trendsights-ai-7ji66.us-central1.hosted.app";
 
   try {
     const session = await stripe.checkout.sessions.create({
