@@ -144,9 +144,9 @@ export async function verifyCheckoutSessionAction({ sessionId }: { sessionId: st
         return { 
           data: { 
             success: true, 
-            message: "Payment verified successfully. You have 10 credits for 24 hours.",
+            message: "Payment verified successfully. You have 2 credits for 24 hours.",
             accessType: 'pass',
-            creditsAdded: 10,
+            creditsAdded: 2,
             expiresAt: expiresAt.toISOString(),
           } 
         };
