@@ -103,18 +103,11 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-
-  // --- DIAGNOSTIC LOGS ---
-  console.log("--- STRIPE CHECKOUT DIAGNOSTICS ---");
-  console.log("Attempting to create checkout session with the following values:");
-  console.log("  - Price ID:", priceId);
-  console.log("  - App URL for redirect:", appUrl);
-  console.log("  - Using Stripe Secret Key starting with:", secretKey.substring(0, 12));
-  console.log("-------------------------------------");
+  // Use the live Firebase URL if available (on deployment), otherwise use the local URL from env vars.
+  const appUrl = process.env.FIREBASE_APP_HOSTING_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9004";
 
   if (!appUrl) {
-    const errorMessage = "Could not determine the redirect URL. Please ensure NEXT_PUBLIC_APP_URL is set in your .env.local file and that the server has been restarted.";
+    const errorMessage = "Could not determine the redirect URL. Please ensure NEXT_PUBLIC_APP_URL is set in your .env.local file for local development.";
     console.error(errorMessage);
     return { error: errorMessage };
   }
