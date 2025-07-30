@@ -1,3 +1,4 @@
+
 "use server";
 
 import { analyzeAttentionHook, type AnalyzeAttentionHookInput } from "@/ai/flows/attention-hook-analyzer";
@@ -91,9 +92,16 @@ export async function generateShareLinkAction(input: GenerateShareLinkInput) {
 }
 
 export async function createCheckoutSessionAction({ priceId }: { priceId: string }) {
+  console.log("Attempting to create checkout session with Price ID:", priceId);
+  console.log("Using Stripe Secret Key starting with:", process.env.STRIPE_SECRET_KEY?.substring(0, 8));
+
   if (!process.env.STRIPE_SECRET_KEY) {
     return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment variables." };
   }
+  if (!priceId) {
+    return { error: "Price ID was not provided. Please select a product." };
+  }
+
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: "2024-06-20",
   });
@@ -175,8 +183,8 @@ export async function verifyCheckoutSessionAction({ sessionId }: { sessionId: st
     } else {
       return { error: `Payment not successful. Status: ${session.payment_status}` };
     }
-  } catch (error) {
-    console.error(error);
-    return { error: "Failed to verify checkout session." };
+  } catch (error: any) {
+    console.error("Error verifying checkout session:", error.message);
+    return { error: `An unexpected error occurred during verification: ${error.message}` };
   }
 }

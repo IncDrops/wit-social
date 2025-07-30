@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 const tiers = [
   {
     name: "Starter Pack",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PASS_PRICE_ID,
+    envVar: "NEXT_PUBLIC_STRIPE_PASS_PRICE_ID",
     price: "$5",
     priceDescription: "2 credits, 24-hour access",
     description: "Perfect for trying out the tools for a specific project.",
@@ -25,7 +26,7 @@ const tiers = [
   },
   {
     name: "Creator Pack",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID,
+    envVar: "NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID",
     price: "$100",
     priceDescription: "50 credits ($2/credit)",
     description: "Ideal for regular content creators and small businesses.",
@@ -39,7 +40,7 @@ const tiers = [
   },
   {
     name: "Agency Bundle",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_AGENCY_PRICE_ID,
+    envVar: "NEXT_PUBLIC_STRIPE_AGENCY_PRICE_ID",
     price: "$500",
     priceDescription: "500 credits ($1/credit)",
     description: "Best value for power users and marketing agencies.",
@@ -56,11 +57,13 @@ export function Billing() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleCheckout = async (priceId: string | undefined) => {
+  const handleCheckout = async (envVar: string) => {
+    const priceId = process.env[envVar];
+
     if (!priceId) {
       toast({
         variant: "destructive",
-        description: "This product is not configured yet. Please check back later.",
+        description: `The price ID for this product is not configured. Please set ${envVar} in your .env.local file.`,
       });
       return;
     }
@@ -117,10 +120,10 @@ export function Billing() {
               <Button 
                 className="w-full" 
                 variant={tier.popular ? "default" : "outline"}
-                onClick={() => handleCheckout(tier.priceId)}
-                disabled={isLoading === tier.priceId}
+                onClick={() => handleCheckout(tier.envVar)}
+                disabled={isLoading === process.env[tier.envVar]}
               >
-                {isLoading === tier.priceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {isLoading === process.env[tier.envVar] ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {tier.cta}
               </Button>
             </CardFooter>
