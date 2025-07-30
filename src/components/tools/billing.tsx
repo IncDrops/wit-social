@@ -15,13 +15,13 @@ const tiers = [
     priceId: process.env.NEXT_PUBLIC_STRIPE_PASS_PRICE_ID,
     price: "$5",
     priceDescription: "One-time payment",
-    description: "Perfect for a single project or trying out our tools.",
+    description: "Get 24-hour access to all tools. No limits, no recurring fees.",
     features: [
-      "Access to any 2 tools in combination",
-      "Use up to tool limits (e.g., 2200 characters)",
+      "Unlimited use of all tools",
+      "Perfect for single projects",
       "24-hour access from time of purchase",
     ],
-    cta: "Get Started",
+    cta: "Get 24-Hour Pass",
   },
   {
     name: "Creator Pack",
@@ -31,7 +31,7 @@ const tiers = [
     description: "Ideal for regular content creators and small businesses.",
     features: [
       "50 credits to use on any tool",
-      "1 credit = 1 tool usage",
+      "1 credit = 1 full tool usage",
       "Credits never expire",
     ],
     cta: "Buy Credits",
@@ -45,7 +45,7 @@ const tiers = [
     description: "Best value for power users and marketing agencies.",
     features: [
       "500 credits to use on any tool",
-      "1 credit = 1 tool usage",
+      "Best value at $1 per credit",
       "Credits never expire",
     ],
     cta: "Buy Credits",

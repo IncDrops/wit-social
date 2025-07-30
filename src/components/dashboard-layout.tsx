@@ -66,7 +66,7 @@ const tools: Tool[] = [
 const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; onToolClick: (id: ToolId) => void }) => {
     const { credits, accessType } = useAccessStore();
     return (
-        <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
+        <div className="flex flex-col h-full bg-background text-foreground">
             <div className="p-4">
             <Logo />
             </div>
@@ -118,7 +118,7 @@ export function DashboardLayout({ initialTool }: { initialTool?: string }) {
   
   return (
     <div className="min-h-screen w-full flex">
-      <aside className="hidden md:block w-64 border-r border-sidebar-border">
+      <aside className="hidden md:block w-64 border-r border-border">
          <SidebarContent activeToolId={activeToolId} onToolClick={handleToolSelection} />
       </aside>
 
