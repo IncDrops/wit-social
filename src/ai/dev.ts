@@ -8,3 +8,4 @@ import '@/ai/flows/trend-prediction-summary.ts';
 import '@/ai/flows/hashtag-generator.ts';
 import '@/ai/flows/optimal-time-to-post.ts';
 import '@/ai/flows/content-sharer.ts';
+import '@/ai/flows/emoji-suggester.ts';

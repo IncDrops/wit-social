@@ -10,6 +10,8 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { generateHashtags } from './hashtag-generator';
+import { suggestEmojis } from './emoji-suggester';
 
 const OptimizeCaptionInputSchema = z.object({
   platform: z
@@ -26,32 +28,30 @@ const OptimizeCaptionOutputSchema = z.object({
 });
 export type OptimizeCaptionOutput = z.infer<typeof OptimizeCaptionOutputSchema>;
 
-const hashtagGenerator = ai.defineTool({
-  name: 'generateHashtags',
+const hashtagGeneratorTool = ai.defineTool({
+  name: 'generateHashtagsForCaption',
   description: 'Generates relevant hashtags for a given topic on a specific platform.',
   inputSchema: z.object({
     topic: z.string().describe('The topic of the caption.'),
     platform: z.string().describe('The social media platform.'),
+    number: z.number().describe('The number of hashtags to generate (usually 3-5).'),
   }),
   outputSchema: z.array(z.string()).describe('An array of relevant hashtags.'),
 }, async (input) => {
-  // Placeholder implementation for hashtag generation.
-  // In a real application, this would call an external API or service.
-  return [`#${input.topic.replace(/ /g, '')}`, `#${input.platform}`, '#viral']
+  const result = await generateHashtags(input);
+  return result.hashtags;
 });
 
-const emojiGenerator = ai.defineTool({
-  name: 'suggestEmojis',
+const emojiGeneratorTool = ai.defineTool({
+  name: 'suggestEmojisForCaption',
   description: 'Suggests relevant emojis to enhance a social media caption.',
   inputSchema: z.object({
     caption: z.string().describe('The caption to add emojis to.'),
-    platform: z.string().describe('The social media platform.'),
   }),
   outputSchema: z.array(z.string()).describe('An array of relevant emojis.'),
 }, async (input) => {
-  // Placeholder implementation for emoji suggestion.
-  // In a real application, this would use an LLM or an emoji API.
-  return ['🚀', '🔥', '✨'];
+  const result = await suggestEmojis({ text: input.caption });
+  return result.emojis;
 });
 
 export async function optimizeCaption(input: OptimizeCaptionInput): Promise<OptimizeCaptionOutput> {
@@ -62,20 +62,23 @@ const prompt = ai.definePrompt({
   name: 'optimizeCaptionPrompt',
   input: {schema: OptimizeCaptionInputSchema},
   output: {schema: OptimizeCaptionOutputSchema},
-  tools: [hashtagGenerator, emojiGenerator],
+  tools: [hashtagGeneratorTool, emojiGeneratorTool],
   prompt: `You are a social media expert. Optimize the following caption for maximum engagement on {{platform}}.
 
 Original Caption: "{{userInput}}"
 
 Instructions:
-- Make the caption {{tone}}.
+- Rewrite the caption to make it more {{tone}}.
 - Adhere to a character limit of {{characterLimit}} characters.
+- Your final output should be a single block of text containing the optimized caption, followed by relevant emojis and hashtags.
 
-If relevant and not already present, use the following tools to suggest hashtags and emojis to increase engagement:
-- hashtagGenerator (topic: topic of the caption, platform: {{platform}})
-- emojiGenerator (caption: optimized caption, platform: {{platform}})
+To do this, you MUST use the provided tools. Follow this sequence:
+1.  First, decide on the core topic of the original caption.
+2.  Call the \`generateHashtagsForCaption\` tool with the identified topic, the target platform, and request 3-5 hashtags.
+3.  Call the \`suggestEmojisForCaption\` tool with the original caption to get relevant emojis.
+4.  Combine the rewritten caption, the suggested emojis, and the generated hashtags into a single, cohesive, and engaging final post. Ensure there are spaces between emojis and that hashtags are at the end.
 
-Output the improved caption. Add relevant hashtags and emojis if missing.`,
+Output only the final, improved caption with emojis and hashtags included.`,
 });
 
 const optimizeCaptionFlow = ai.defineFlow(
