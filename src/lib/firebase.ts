@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, type FirebaseOptions } from "firebase/app";
 import { getFirestore, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
-import type { Trend } from "@/lib/data";
+import { mockTrends, type Trend } from "@/lib/data";
 
 // Your web app's Firebase configuration
 const firebaseConfig: FirebaseOptions = {
@@ -19,6 +19,10 @@ const db = getFirestore(app);
 
 // Function to fetch trends from Firestore
 export async function getTrends(): Promise<Trend[]> {
+    // Returning mock data for now so the user can repopulate their database.
+    // We will switch this back to Firestore later.
+    return mockTrends;
+
     try {
         const trendsCollection = collection(db, 'trends');
         const trendsQuery = query(trendsCollection, orderBy('engagement_score', 'desc'), limit(10));
