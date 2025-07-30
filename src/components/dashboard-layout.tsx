@@ -12,7 +12,7 @@ import {
   TrendingUp,
   Clock,
   Menu,
-  X,
+  ShieldCheck,
 } from "lucide-react";
 
 import { Logo } from "@/components/logo";
@@ -123,8 +123,9 @@ export function DashboardLayout() {
             <div className="flex justify-center gap-4">
                 <Link href="/terms" className="hover:text-foreground">Terms of Use</Link>
                 <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+                <Link href="/patent" className="hover:text-foreground">Patent Pending</Link>
             </div>
-            <p className="mt-2">© {new Date().getFullYear()} WillItTrend.com. All rights reserved.</p>
+            <p className="mt-2">© {new Date().getFullYear()} WillItTrend.com by IncDrops LLC. All rights reserved.</p>
         </footer>
       </div>
     </div>
