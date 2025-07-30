@@ -84,7 +84,7 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     return { error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment variables." };
   }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9002";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9004";
 
   try {
     const session = await stripe.checkout.sessions.create({
