@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview This file defines the Cloud Functions for the application, including the scheduled trend discovery job.
  */

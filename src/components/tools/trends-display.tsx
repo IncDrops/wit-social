@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -20,15 +21,16 @@ export function TrendsDisplay() {
         setError(null);
         let fetchedTrends = await getTrends();
         
-        // If Firestore is empty, fall back to mock data
+        // If Firestore is empty or fails, fall back to mock data
         if (fetchedTrends.length === 0) {
-            console.warn("No trends found in Firestore. Falling back to mock data.");
+            console.warn("No trends found in Firestore. Falling back to mock data for demonstration.");
             fetchedTrends = mockTrends;
+            setError("Displaying sample trends. Live data will appear here once the database is populated by the AI agent.");
         }
 
         setTrends(fetchedTrends);
       } catch (err) {
-        setError("Failed to fetch trends. Falling back to mock data.");
+        setError("Failed to fetch trends. Displaying sample data.");
         console.error(err);
         setTrends(mockTrends); // Also fallback on error
       } finally {
@@ -43,7 +45,7 @@ export function TrendsDisplay() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">Real-Time Trends</h1>
-        <p className="text-muted-foreground">The latest trends shaping the social media landscape, powered by Firestore.</p>
+        <p className="text-muted-foreground">The latest trends shaping the social media landscape, updated daily by AI.</p>
       </div>
 
       {error && !isLoading && (
