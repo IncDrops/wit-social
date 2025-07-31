@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: "WIT Social AI",
   description: "AI-Powered Social Media Trend Analysis",
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export default function RootLayout({
