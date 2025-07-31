@@ -19,20 +19,32 @@ export function TrendsDisplay() {
       try {
         setIsLoading(true);
         setError(null);
-        let fetchedTrends = await getTrends();
+        const fetchedTrends = await getTrends();
         
-        // If Firestore is empty or fails, fall back to mock data
+        // Combine mock data with fetched data, avoiding duplicates
+        const trendMap = new Map<string, Trend>();
+        
+        // Add mock trends first to ensure a baseline
+        mockTrends.forEach(trend => trendMap.set(trend.title.toLowerCase(), trend));
+        
+        // Overwrite with any fetched trends to show live data
+        fetchedTrends.forEach(trend => trendMap.set(trend.title.toLowerCase(), trend));
+
+        const combinedTrends = Array.from(trendMap.values());
+        
+        // Sort by engagement score descending
+        combinedTrends.sort((a, b) => b.engagement_score - a.engagement_score);
+
+        setTrends(combinedTrends);
+
         if (fetchedTrends.length === 0) {
-            console.warn("No trends found in Firestore. Falling back to mock data for demonstration.");
-            fetchedTrends = mockTrends;
-            setError("Displaying sample trends. Live data will appear here once the database is populated by the AI agent.");
+            setError("Displaying sample trends. Live AI-discovered trends will appear here automatically as they are found.");
         }
 
-        setTrends(fetchedTrends);
       } catch (err) {
-        setError("Failed to fetch trends. Displaying sample data.");
+        setError("Failed to fetch live trends. Displaying sample data.");
         console.error(err);
-        setTrends(mockTrends); // Also fallback on error
+        setTrends(mockTrends); // Fallback to only mocks on error
       } finally {
         setIsLoading(false);
       }
