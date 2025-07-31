@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Tags, Rss } from "lucide-react";
 import { getTrends } from "@/lib/firebase";
-import type { Trend } from "@/lib/data";
+import { mockTrends, type Trend } from "@/lib/data";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function TrendsDisplay() {
@@ -17,14 +17,20 @@ export function TrendsDisplay() {
     async function fetchTrends() {
       try {
         setIsLoading(true);
-        const fetchedTrends = await getTrends();
-        setTrends(fetchedTrends);
+        setError(null);
+        let fetchedTrends = await getTrends();
+        
+        // If Firestore is empty, fall back to mock data
         if (fetchedTrends.length === 0) {
-            setError("No trends found. Please add some to the 'trends' collection in your Firestore database.");
+            console.warn("No trends found in Firestore. Falling back to mock data.");
+            fetchedTrends = mockTrends;
         }
+
+        setTrends(fetchedTrends);
       } catch (err) {
-        setError("Failed to fetch trends. Please check the console for more details.");
+        setError("Failed to fetch trends. Falling back to mock data.");
         console.error(err);
+        setTrends(mockTrends); // Also fallback on error
       } finally {
         setIsLoading(false);
       }
@@ -43,7 +49,7 @@ export function TrendsDisplay() {
       {error && !isLoading && (
         <Card>
             <CardHeader>
-                <CardTitle>Error</CardTitle>
+                <CardTitle>Notice</CardTitle>
                 <CardDescription>{error}</CardDescription>
             </CardHeader>
         </Card>
