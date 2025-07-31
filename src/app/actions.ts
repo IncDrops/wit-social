@@ -104,13 +104,8 @@ export async function createCheckoutSessionAction({ priceId }: { priceId: string
     apiVersion: "2024-06-20",
   });
   
-  // Use Firebase Hosting URL if available, otherwise default to localhost for development
-  const firebaseHostingUrl = process.env.FIREBASE_HOSTING_URL;
-  let appUrl = 'http://localhost:9004';
-  if (firebaseHostingUrl) {
-    appUrl = `https://${firebaseHostingUrl}`;
-  }
-
+  // Hardcode the production URL to ensure correct redirects
+  const appUrl = 'https://willittrend.com';
 
   try {
     const session = await stripe.checkout.sessions.create({
