@@ -4,7 +4,7 @@ import { initializeApp, getApps, getApp, type FirebaseOptions } from "firebase/a
 import { getFirestore, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import type { Trend } from "@/lib/data";
 
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration, sourced from environment variables
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
