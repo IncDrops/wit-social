@@ -1,3 +1,4 @@
+
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp, type FirebaseOptions } from "firebase/app";
 import { getFirestore, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
@@ -5,12 +6,12 @@ import type { Trend } from "@/lib/data";
 
 // Your web app's Firebase configuration
 const firebaseConfig: FirebaseOptions = {
-  projectId: "trendsights-ai-2tpf3",
-  appId: "1:240319807394:web:64860f2cf31c165723bcfb",
-  storageBucket: "trendsights-ai-2tpf3.firebasestorage.app",
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: "trendsights-ai-2tpf3.firebaseapp.com",
-  messagingSenderId: "240319807394",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
