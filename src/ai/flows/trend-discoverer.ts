@@ -11,16 +11,15 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import * as admin from 'firebase-admin';
 
-// Initialize Firebase Admin SDK. When running in a Google Cloud environment (like Cloud Functions),
-// initializeApp() automatically discovers the project's credentials.
-try {
-  if (!admin.apps.length) {
+// Initialize Firebase Admin SDK only if it hasn't been initialized yet.
+// This is the standard pattern for ensuring the SDK is ready in various environments.
+if (!admin.apps.length) {
+  try {
     admin.initializeApp();
+  } catch (e) {
+    console.error('Firebase admin initialization error:', e);
   }
-} catch (e) {
-  console.error('Firebase admin initialization error:', e);
 }
-
 
 const db = admin.firestore();
 
