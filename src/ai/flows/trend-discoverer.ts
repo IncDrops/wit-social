@@ -11,12 +11,16 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import * as admin from 'firebase-admin';
 
-// Initialize Firebase Admin SDK if not already initialized
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
-  });
+// Initialize Firebase Admin SDK. When running in a Google Cloud environment (like Cloud Functions),
+// initializeApp() automatically discovers the project's credentials.
+try {
+  if (!admin.apps.length) {
+    admin.initializeApp();
+  }
+} catch (e) {
+  console.error('Firebase admin initialization error:', e);
 }
+
 
 const db = admin.firestore();
 
