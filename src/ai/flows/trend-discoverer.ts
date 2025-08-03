@@ -11,10 +11,12 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import * as admin from 'firebase-admin';
 
-// Initialize Firebase Admin SDK only if it hasn't been initialized yet.
-// This is the standard pattern for ensuring the SDK is ready in various environments.
+// Check if the app is already initialized to prevent errors
 if (!admin.apps.length) {
   try {
+    // When running in a serverless environment (like Vercel or Firebase Functions),
+    // initializeApp() without arguments will use the service account credentials
+    // available in the environment.
     admin.initializeApp();
   } catch (e) {
     console.error('Firebase admin initialization error:', e);
@@ -55,7 +57,7 @@ export const discoverAndSaveTrends = ai.defineFlow(
     const { output } = await discoverTrendsPrompt();
     if (!output || !output.trends || output.trends.length === 0) {
         console.log('No trends were discovered by the AI.');
-        return;
+        return { success: true, message: "No new trends discovered." };
     }
 
     console.log(`Discovered ${output.trends.length} new trends. Saving to Firestore...`);
@@ -71,7 +73,9 @@ export const discoverAndSaveTrends = ai.defineFlow(
 
     try {
         await batch.commit();
-        console.log('Successfully saved new trends to Firestore.');
+        const successMessage = `Successfully saved ${output.trends.length} new trends to Firestore.`;
+        console.log(successMessage);
+        return { success: true, message: successMessage };
     } catch (error) {
         console.error('Error saving trends to Firestore:', error);
         throw new Error('Failed to save trends to Firestore.');
