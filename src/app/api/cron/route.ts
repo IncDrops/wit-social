@@ -5,8 +5,9 @@ import { discoverAndSaveTrends } from '@/ai/flows/trend-discoverer';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const cronSecret = request.headers.get('x-cron-secret');
-  if (cronSecret !== process.env.CRON_SECRET) {
+  // Use Vercel's built-in cron job security
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.VERCEL_CRON_SECRET}`) {
     return new Response('Unauthorized', {
       status: 401,
     });
