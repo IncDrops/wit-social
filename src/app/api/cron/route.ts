@@ -5,8 +5,8 @@ import { discoverAndSaveTrends } from '@/ai/flows/trend-discoverer';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = request.headers.get('x-cron-secret');
+  if (cronSecret !== process.env.CRON_SECRET) {
     return new Response('Unauthorized', {
       status: 401,
     });
