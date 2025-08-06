@@ -55,7 +55,7 @@ interface Tool {
   component: FC;
 }
 
-const tools: Tool[] = [
+const baseTools: Tool[] = [
   { id: "trends", label: "Real-Time Trends", icon: TrendingUp, component: TrendsDisplay },
   { id: "viral-post", label: "Viral Post Ideas", icon: Lightbulb, component: ViralPostGenerator },
   { id: "caption-optimizer", label: "Caption Optimizer", icon: Sparkles, component: CaptionOptimizer },
@@ -65,8 +65,15 @@ const tools: Tool[] = [
   { id: "hook-analyzer", label: "Attention Hook Analyzer", icon: Megaphone, component: HookAnalyzer },
   { id: "content-sharer", label: "Content Sharer", icon: Share2, component: ContentSharer },
   { id: "billing", label: "Billing", icon: CreditCard, component: Billing },
-  { id: "admin", label: "Admin", icon: Cog, component: AdminTool },
 ];
+
+// Conditionally add the admin tool only in development environment
+if (process.env.NODE_ENV === 'development') {
+    baseTools.push({ id: "admin", label: "Admin", icon: Cog, component: AdminTool });
+}
+
+const tools: Tool[] = baseTools;
+
 
 const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; onToolClick: (id: ToolId) => void }) => {
     const { credits, accessType, passExpiresAt } = useAccessStore();
