@@ -20,31 +20,20 @@ export function TrendsDisplay() {
         setIsLoading(true);
         setError(null);
         const fetchedTrends = await getTrends();
-        
-        // Combine mock data with fetched data, avoiding duplicates
-        const trendMap = new Map<string, Trend>();
-        
-        // Add mock trends first to ensure a baseline
-        mockTrends.forEach(trend => trendMap.set(trend.title.toLowerCase(), trend));
-        
-        // Overwrite with any fetched trends to show live data
-        fetchedTrends.forEach(trend => trendMap.set(trend.title.toLowerCase(), trend));
 
-        const combinedTrends = Array.from(trendMap.values());
-        
-        // Sort by engagement score descending
-        combinedTrends.sort((a, b) => b.engagement_score - a.engagement_score);
-
-        setTrends(combinedTrends);
-
-        if (fetchedTrends.length === 0) {
-            setError("Displaying sample trends. Live AI-discovered trends will appear here automatically as they are found.");
+        if (fetchedTrends.length > 0) {
+          // If we have live trends, use them exclusively
+          setTrends(fetchedTrends.sort((a, b) => b.engagement_score - a.engagement_score));
+        } else {
+          // Otherwise, fall back to mock data and show a notice
+          setError("Displaying sample trends. Live AI-discovered trends will appear here automatically as they are found.");
+          setTrends(mockTrends.sort((a, b) => b.engagement_score - a.engagement_score));
         }
 
       } catch (err) {
         setError("Failed to fetch live trends. Displaying sample data.");
         console.error(err);
-        setTrends(mockTrends); // Fallback to only mocks on error
+        setTrends(mockTrends.sort((a, b) => b.engagement_score - a.engagement_score)); // Fallback to mocks on error
       } finally {
         setIsLoading(false);
       }
