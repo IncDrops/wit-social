@@ -8,6 +8,7 @@ import { getOptimalTimeToPost, type OptimalTimeToPostInput } from "@/ai/flows/op
 import { trendPredictionSummary, type TrendPredictionSummaryInput } from "@/ai/flows/trend-prediction-summary";
 import { generateViralPostIdeas, type ViralPostIdeasInput } from "@/ai/flows/viral-post-idea-generator";
 import { generateShareLink, type GenerateShareLinkInput } from "@/ai/flows/content-sharer";
+import { discoverAndSaveTrends } from "@/ai/flows/trend-discoverer";
 import Stripe from "stripe";
 import { v4 as uuidv4 } from "uuid";
 
@@ -185,5 +186,19 @@ export async function verifyCheckoutSessionAction({ sessionId }: { sessionId: st
   } catch (error: any) {
     console.error("Error verifying checkout session:", error.message);
     return { error: `An unexpected error occurred during verification: ${error.message}` };
+  }
+}
+
+export async function runTrendDiscoveryAction() {
+  try {
+    const result = await discoverAndSaveTrends();
+    if (result.success) {
+      return { data: result };
+    } else {
+      return { error: result.message || 'An unknown error occurred during trend discovery.' };
+    }
+  } catch (error: any) {
+    console.error("runTrendDiscoveryAction failed:", error);
+    return { error: error.message || "An unexpected server error occurred." };
   }
 }

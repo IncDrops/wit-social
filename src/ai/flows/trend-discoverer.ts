@@ -11,20 +11,6 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import * as admin from 'firebase-admin';
 
-// Check if the app is already initialized to prevent errors
-if (!admin.apps.length) {
-  try {
-    // When running in a serverless environment (like Vercel or Firebase Functions),
-    // initializeApp() without arguments will use the service account credentials
-    // available in the environment.
-    admin.initializeApp();
-  } catch (e) {
-    console.error('Firebase admin initialization error:', e);
-  }
-}
-
-const db = admin.firestore();
-
 const TrendSchema = z.object({
   title: z.string().describe('The catchy title of the trend.'),
   category: z.string().describe('The general category (e.g., Technology, Marketing, Content Creation).'),
@@ -53,6 +39,21 @@ export const discoverAndSaveTrends = ai.defineFlow(
     name: 'discoverAndSaveTrends',
   },
   async () => {
+    // Initialize Firebase Admin SDK if not already initialized
+    if (!admin.apps.length) {
+      try {
+        admin.initializeApp();
+        console.log('Firebase Admin SDK initialized successfully.');
+      } catch (error) {
+        console.error('Firebase Admin SDK initialization error:', error);
+        // Throw an error to stop the flow if initialization fails
+        throw new Error('Could not initialize Firebase Admin SDK.');
+      }
+    }
+    
+    // Get Firestore instance after initialization
+    const db = admin.firestore();
+
     console.log('Starting trend discovery flow...');
     const { output } = await discoverTrendsPrompt();
     if (!output || !output.trends || output.trends.length === 0) {

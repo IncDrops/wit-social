@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,6 +16,7 @@ import {
   ShieldCheck,
   Share2,
   CreditCard,
+  Cog,
 } from "lucide-react";
 
 import { Logo } from "@/components/logo";
@@ -32,6 +34,7 @@ import { ContentSharer } from "@/components/tools/content-sharer";
 import { Billing } from "@/components/tools/billing";
 import { useAccessStore } from "@/hooks/use-access-store";
 import { Badge } from "./ui/badge";
+import { AdminTool } from "./tools/admin-tool";
 
 type ToolId =
   | "trends"
@@ -42,7 +45,8 @@ type ToolId =
   | "hashtag-generator"
   | "hook-analyzer"
   | "content-sharer"
-  | "billing";
+  | "billing"
+  | "admin";
 
 interface Tool {
   id: ToolId;
@@ -61,6 +65,7 @@ const tools: Tool[] = [
   { id: "hook-analyzer", label: "Attention Hook Analyzer", icon: Megaphone, component: HookAnalyzer },
   { id: "content-sharer", label: "Content Sharer", icon: Share2, component: ContentSharer },
   { id: "billing", label: "Billing", icon: CreditCard, component: Billing },
+  { id: "admin", label: "Admin", icon: Cog, component: AdminTool },
 ];
 
 const SidebarContent = ({ activeToolId, onToolClick }: { activeToolId: ToolId; onToolClick: (id: ToolId) => void }) => {
