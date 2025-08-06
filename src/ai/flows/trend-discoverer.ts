@@ -22,6 +22,28 @@ const TrendDiscoveryOutputSchema = z.object({
   trends: z.array(TrendSchema).describe('A list of 3-5 new and emerging trends.'),
 });
 
+const initializeFirebaseAdmin = () => {
+    if (admin.apps.length > 0) {
+        return;
+    }
+    
+    const serviceAccountString = process.env.FIREBASE_ADMIN_SDK_CONFIG;
+    if (!serviceAccountString) {
+        throw new Error('The FIREBASE_ADMIN_SDK_CONFIG environment variable is not set. It is required for the app to connect to Firebase.');
+    }
+
+    try {
+        const serviceAccount = JSON.parse(serviceAccountString);
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+        console.log('Firebase Admin SDK initialized successfully.');
+    } catch (error) {
+        console.error('Failed to parse or initialize Firebase Admin SDK:', error);
+        throw new Error('Firebase configuration is invalid.');
+    }
+};
+
 const discoverTrendsPrompt = ai.definePrompt({
   name: 'discoverTrendsPrompt',
   output: { schema: TrendDiscoveryOutputSchema },
@@ -39,19 +61,14 @@ export const discoverAndSaveTrends = ai.defineFlow(
     name: 'discoverAndSaveTrends',
   },
   async () => {
-    // Initialize Firebase Admin SDK if not already initialized
-    if (!admin.apps.length) {
-      try {
-        admin.initializeApp();
-        console.log('Firebase Admin SDK initialized successfully.');
-      } catch (error) {
-        console.error('Firebase Admin SDK initialization error:', error);
-        // Throw an error to stop the flow if initialization fails
-        throw new Error('Could not initialize Firebase Admin SDK.');
-      }
+    try {
+        initializeFirebaseAdmin();
+    } catch(error: any) {
+        console.error("Firebase Admin initialization failed", error);
+        // Re-throw the error to ensure the calling function knows about the failure.
+        throw error;
     }
     
-    // Get Firestore instance after initialization
     const db = admin.firestore();
 
     console.log('Starting trend discovery flow...');
@@ -66,7 +83,6 @@ export const discoverAndSaveTrends = ai.defineFlow(
     const batch = db.batch();
 
     for (const trend of output.trends) {
-      // Create a new document with a unique ID for each trend
       const docRef = trendsCollection.doc();
       batch.set(docRef, trend);
       console.log(`Adding trend to batch: ${trend.title}`);
